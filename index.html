@@ -2,66 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merton Jump Diffusion Simulator</title>
-    <link rel="stylesheet" href="static/styles.css">
+    <title>Jump Diffusion Option Pricing</title>
 </head>
 <body>
-    <header>
-        <h1>Merton Jump Diffusion Simulator</h1>
-    </header>
-    
-    <main>
-        <section class="simulation-form">
-            <h2>Parameter Input</h2>
-            <form method="POST" action="/">
-                <div class="input-group">
-                    <label for="S0">Initial Stock Price (S0):</label>
-                    <input type="number" name="S0" step="0.01" required>
-                </div>
-                <div class="input-group">
-                    <label for="r">Risk-Free Rate (r):</label>
-                    <input type="number" name="r" step="0.001" required>
-                </div>
-                <div class="input-group">
-                    <label for="sigma">Volatility (sigma):</label>
-                    <input type="number" name="sigma" step="0.001" required>
-                </div>
-                <div class="input-group">
-                    <label for="T">Time to Maturity (T):</label>
-                    <input type="number" name="T" step="0.01" required>
-                </div>
-                <div class="input-group">
-                    <label for="lambda_J">Jump Intensity (lambda_J):</label>
-                    <input type="number" name="lambda_J" step="0.01" required>
-                </div>
-                <div class="input-group">
-                    <label for="mu_J">Jump Mean (mu_J):</label>
-                    <input type="number" name="mu_J" step="0.01" required>
-                </div>
-                <div class="input-group">
-                    <label for="sigma_J">Jump Volatility (sigma_J):</label>
-                    <input type="number" name="sigma_J" step="0.01" required>
-                </div>
-                <div class="input-group">
-                    <button type="submit">Simulate</button>
-                </div>
-            </form>
-        </section>
-        
-        <section class="simulation-result">
+    <h1>Jump Diffusion Option Pricing</h1>
+
+    <form method="POST">
+        <label for="S0">Initial Stock Price (S0):</label>
+        <input type="text" name="S0" id="S0" required><br>
+
+        <label for="K">Strike Price (K):</label>
+        <input type="text" name="K" id="K" required><br>
+
+        <label for="T">Time to Maturity (T):</label>
+        <input type="text" name="T" id="T" required><br>
+
+        <label for="r">Risk-Free Rate (r):</label>
+        <input type="text" name="r" id="r" required><br>
+
+        <label for="sigma">Volatility (sigma):</label>
+        <input type="text" name="sigma" id="sigma" required><br>
+
+        <label for="lambd">Jump Intensity (lambda):</label>
+        <input type="text" name="lambd" id="lambd" required><br>
+
+        <label for="jumps">Number of Jumps:</label>
+        <input type="text" name="jumps" id="jumps" required><br>
+
+        <label for="n_steps">Number of Time Steps:</label>
+        <input type="text" name="n_steps" id="n_steps" required><br>
+
+        <button type="submit">Calculate Option Price</button>
+    </form>
+
+    {% if calculation_successful is defined %}
+        {% if calculation_successful %}
+            <h2>Option Price: {{ option_price }}</h2>
             {% if plot_filename %}
-                <h2>Simulation Result</h2>
-                <div class="chart-container">
-                    <img src="{{ plot_filename }}" alt="Simulation Chart">
-                </div>
-                <a href="{{ plot_filename }}" download="merton_jump_diffusion_chart.png" class="download-link">Download Chart</a>
+                <h2>Sample Stock Price Paths</h2>
+                <img src="{{ plot_filename }}" alt="Stock Price Paths">
             {% endif %}
-        </section>
-    </main>
-    
-    <footer>
-        <p>&copy; 2023 Your Company</p>
-    </footer>
+        {% else %}
+            <p style="color: red;">Invalid input. Please check your input values.</p>
+        {% endif %}
+    {% endif %}
 </body>
 </html>
