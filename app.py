@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from flask import Flask, render_template, request
 
+app = Flask(__name__)
+
 def jump_diffusion_monte_carlo(S0, K, T, r, sigma, lambd, jumps, n_simulations, n_steps):
     dt = T / n_steps
     discount_factor = np.exp(-r * T)
@@ -21,27 +23,50 @@ def jump_diffusion_monte_carlo(S0, K, T, r, sigma, lambd, jumps, n_simulations, 
         option_prices.append(option_payoff)
     option_price = np.mean(option_prices) * discount_factor
     return option_price
-# Example usage:
-S0 = 100.0  # Initial stock price
-K = 100.0   # Strike price
-T = 1.0    # Time to maturity
-r = 0.05   # Risk-free interest rate
-sigma = 0.2  # Volatility
-lambd = 0.2  # Jump intensity
-jumps = 1  # Number of jumps in the model
-n_simulations = 1000 # Number of Monte Carlo simulations
-n_steps = 100  # Number of time steps
-option_price = jump_diffusion_monte_carlo(S0, K, T, r, sigma, lambd, jumps, n_simulations, n_steps)
-print(f"Option Price: {option_price:.4f}")
 
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        try:
+            S0 = float(request.form['S0'])
+            K = float(request.form['K'])
+            T = float(request.form['T'])
+            r = float(request.form['r'])
+            sigma = float(request.form['sigma'])
+            lambd = float(request.form['lambd'])
+            jumps = int(request.form['jumps'])
+            n_steps = int(request.form['n_steps'])
 
-list = np.random.uniform(95, 105, size = (30,)) #Asset prices in 30 days
-m = []
-for i in range(30):
-  option = jump_diffusion_monte_carlo(list[i], K, T, r, sigma, lambd, jumps, n_simulations, n_steps)
-  m.append(option)
+            # Set n_simulations to 1 (permanently)
+            n_simulations = 100
 
-plt.plot(m)
-plt.title("Estimated option prices")
-plt.xlabel("Day of the month")
-plt.ylabel("option price")
+            option_price = jump_diffusion_monte_carlo(S0, K, T, r, sigma, lambd, jumps, n_simulations, n_steps)
+
+            # Generate a plot (as before)
+            #n_days = 30 
+            lst = np.random.uniform(S0-10, S0+10, size =(30, ))
+            x = []
+            for i in range (30):
+             x.append(jump_diffusion_monte_carlo(lst[i], K, T, r, sigma, lambd, jumps, n_simulations, n_steps))
+            plt.figure(figsize=(10, 6))
+            
+                
+            plt.plot( x)
+            plt.xlabel('days')
+            plt.ylabel('Option price')
+            plt.title('option prices')
+            plt.grid(True)
+
+            # Save the plot to a temporary file
+            plot_filename = 'static/plot.png'
+            plt.savefig(plot_filename, format='png')
+            plt.close()
+
+            return render_template('index.html', option_price=option_price, plot_filename=plot_filename, calculation_successful=True)
+        except ValueError:
+            return render_template('index.html', calculation_successful=False)
+    
+    return render_template('index.html', calculation_successful=None)
+
+if __name__ == '__main__':
+    app.run(debug=True)
