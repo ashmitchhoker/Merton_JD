@@ -1,57 +1,45 @@
-from flask import Flask, render_template, request
 import numpy as np
 import matplotlib.pyplot as plt
-from io import BytesIO
-import base64
+def jump_diffusion_monte_carlo(S0, K, T, r, sigma, lambd, jumps, n_simulations, n_steps):
+    dt = T / n_steps
+    discount_factor = np.exp(-r * T)
 
-app = Flask(__name__)
+    option_prices = []
+    for _ in range(n_simulations):
+        price_path = [S0]
+        for _ in range(n_steps):
+            Z1 = np.random.normal(0, 1)
+            N = np.random.poisson(lambd * dt)
+            Z2 = np.random.normal(0, 1, N)
+            jump = np.sum(Z2)
+            next_price = price_path[-1] * np.exp((r - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * Z1 + jump)
+            price_path.append(next_price)
 
-# Define the route for the home page
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    # Default parameter values
-    default_values = {
-        'S0': 100.0,
-        'r': 0.05,
-        'sigma': 0.2,
-        'T': 1.0,
-        'lambda_J': 0.1,
-        'mu_J': -0.1,
-        'sigma_J': 0.2
-    }
+        option_payoff = max(price_path[-1] - K, 0)  # European call option payoff
+        option_prices.append(option_payoff)
+    option_price = np.mean(option_prices) * discount_factor
+    return option_price
+# Example usage:
+S0 = 100.0  # Initial stock price
+K = 100.0   # Strike price
+T = 1.0    # Time to maturity
+r = 0.05   # Risk-free interest rate
+sigma = 0.2  # Volatility
+lambd = 0.2  # Jump intensity
+jumps = 1  # Number of jumps in the model
+n_simulations = 1000 # Number of Monte Carlo simulations
+n_steps = 100  # Number of time steps
+option_price = jump_diffusion_monte_carlo(S0, K, T, r, sigma, lambd, jumps, n_simulations, n_steps)
+print(f"Option Price: {option_price:.4f}")
 
-    if request.method == 'POST':
-        # Retrieve user input from the form or use default values if not provided
-        S0 = float(request.form.get('S0', default_values['S0']))
-        r = float(request.form.get('r', default_values['r']))
-        sigma = float(request.form.get('sigma', default_values['sigma']))
-        T = float(request.form.get('T', default_values['T']))
-        lambda_J = float(request.form.get('lambda_J', default_values['lambda_J']))
-        mu_J = float(request.form.get('mu_J', default_values['mu_J']))
-        sigma_J = float(request.form.get('sigma_J', default_values['sigma_J']))
 
-        # Perform the Merton Jump Diffusion simulation
-        # (Insert your simulation code here)
+list = np.random.uniform(95, 105, size = (30,)) #Asset prices in 30 days
+m = []
+for i in range(30):
+  option = jump_diffusion_monte_carlo(list[i], K, T, r, sigma, lambd, jumps, n_simulations, n_steps)
+  m.append(option)
 
-        # Generate a simple plot (you can customize this)
-        x = np.linspace(0, T, 100)
-        y = S0 * np.exp((r - lambda_J * (mu_J + 0.5 * sigma_J ** 2)) * x + sigma * np.sqrt(x) * np.random.normal(size=100))
-
-        plt.plot(x, y)
-        plt.xlabel('Time')
-        plt.ylabel('Stock Price')
-        plt.title('Merton Jump Diffusion Simulation')
-        plt.grid(True)
-
-        # Save the plot to a BytesIO object and encode it as base64
-        buffer = BytesIO()
-        plt.savefig(buffer, format='png')
-        plot_data = base64.b64encode(buffer.getvalue()).decode()
-        plt.close()
-
-        return render_template('index.html', plot_filename=f'data:image/png;base64,{plot_data}', default_values=default_values)
-
-    return render_template('index.html', default_values=default_values)
-
-if __name__ == '__main__':
-    app.run(debug=True)
+plt.plot(m)
+plt.title("Estimated option prices")
+plt.xlabel("Day of the month")
+plt.ylabel("option price")
