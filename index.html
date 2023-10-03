@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merton Jump Diffusion Simulator</title>
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Merton Jump Diffusion Simulator</h1>
+    </header>
+    
+    <main>
+        <section class="simulation-form">
+            <h2>Parameter Input</h2>
+            <form method="POST" action="/">
+                <div class="input-group">
+                    <label for="S0">Initial Stock Price (S0):</label>
+                    <input type="number" name="S0" step="0.01" required>
+                </div>
+                <div class="input-group">
+                    <label for="r">Risk-Free Rate (r):</label>
+                    <input type="number" name="r" step="0.001" required>
+                </div>
+                <div class="input-group">
+                    <label for="sigma">Volatility (sigma):</label>
+                    <input type="number" name="sigma" step="0.001" required>
+                </div>
+                <div class="input-group">
+                    <label for="T">Time to Maturity (T):</label>
+                    <input type="number" name="T" step="0.01" required>
+                </div>
+                <div class="input-group">
+                    <label for="lambda_J">Jump Intensity (lambda_J):</label>
+                    <input type="number" name="lambda_J" step="0.01" required>
+                </div>
+                <div class="input-group">
+                    <label for="mu_J">Jump Mean (mu_J):</label>
+                    <input type="number" name="mu_J" step="0.01" required>
+                </div>
+                <div class="input-group">
+                    <label for="sigma_J">Jump Volatility (sigma_J):</label>
+                    <input type="number" name="sigma_J" step="0.01" required>
+                </div>
+                <div class="input-group">
+                    <button type="submit">Simulate</button>
+                </div>
+            </form>
+        </section>
+        
+        <section class="simulation-result">
+            {% if plot_filename %}
+                <h2>Simulation Result</h2>
+                <div class="chart-container">
+                    <img src="{{ plot_filename }}" alt="Simulation Chart">
+                </div>
+                <a href="{{ plot_filename }}" download="merton_jump_diffusion_chart.png" class="download-link">Download Chart</a>
+            {% endif %}
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2023 Your Company</p>
+    </footer>
+</body>
+</html>
