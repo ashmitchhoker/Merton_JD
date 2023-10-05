@@ -38,7 +38,7 @@ def index():
             n_steps = int(request.form['n_steps'])
 
             # Set n_simulations to 1 (permanently)
-            n_simulations = 100
+            n_simulations = 1
 
             option_price = jump_diffusion_monte_carlo(S0, K, T, r, sigma, lambd, jumps, n_simulations, n_steps)
 
