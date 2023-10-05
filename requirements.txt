@@ -1,0 +1,3 @@
+pip install numpy
+pip install matplotib
+pip install numpy flask
