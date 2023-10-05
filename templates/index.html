@@ -1,1 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jump Diffusion Option Pricing</title>
+</head>
+<body>
+    <h1>Jump Diffusion Option Pricing</h1>
 
+    <form method="POST">
+        <label for="S0">Initial Stock Price (S0):</label>
+        <input type="text" name="S0" id="S0" required><br>
+
+        <label for="K">Strike Price (K):</label>
+        <input type="text" name="K" id="K" required><br>
+
+        <label for="T">Time to Maturity (T):</label>
+        <input type="text" name="T" id="T" required><br>
+
+        <label for="r">Risk-Free Rate (r):</label>
+        <input type="text" name="r" id="r" required><br>
+
+        <label for="sigma">Volatility (sigma):</label>
+        <input type="text" name="sigma" id="sigma" required><br>
+
+        <label for="lambd">Jump Intensity (lambda):</label>
+        <input type="text" name="lambd" id="lambd" required><br>
+
+        <label for="jumps">Number of Jumps:</label>
+        <input type="text" name="jumps" id="jumps" required><br>
+
+        <label for="n_steps">Number of Time Steps:</label>
+        <input type="text" name="n_steps" id="n_steps" required><br>
+
+        <button type="submit">Calculate Option Price</button>
+    </form>
+
+    {% if calculation_successful is defined %}
+        {% if calculation_successful %}
+            <h2>Option Price: {{ option_price }}</h2>
+            {% if plot_filename %}
+                <h2>Sample Option Price Paths</h2>
+                <img src="{{ plot_filename }}" alt="Stock Price Paths">
+            {% endif %}
+        {% else %}
+            <p style="color: red;">Invalid input. Please check your input values.</p>
+        {% endif %}
+    {% endif %}
+</body>
+</html>
